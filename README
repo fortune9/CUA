@@ -1,18 +1,35 @@
-Bio-CUA
+1. Bio-CUA
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+Version: 1.01
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+2. Purpose
+
+The aim of this distribution is to provide comprehensive and flexible
+tools to analyze codon usage bias (CUB) and relevant problems.
+
+One amino acid can be encoded by more than one synonymous codon, and
+synonymous codons are unevenly used. For example, some codons are used
+more often than other synonymous ones in highly expressed genes
+(I<Sharp and Li 1987>). To measure the unevenness of codon usage, multiple
+indices of codon usage bias have been developed, such as Fop
+(Frequency of optimal codons), CAI (Codon Adaptation Index), tAI (tRNA
+Adaptation Index), and ENC (Effective Number of Codons). The causes of
+CUB phenomena are complicated, including, mutational bias, selection
+on translational efficiency or accurancy. CUB is one fundamental concept
+in genetics.
+
+So far, no software exists to compute all the above CUB indices, and
+worse is that parameters of CUB calculations are often fixed in
+software, so one can only analyze genes in a limited list of species
+and one can not incorporate its own parameters such as sequences of
+highly expressed genes in a tissue.
+
+This package mainly solves these two problems. We also extend some
+methods, such as GC-content corrected ENC, background-data normalized
+CAI, etc. See the relevant methods in CUB classes for more details.
 
 
-INSTALLATION
+3. INSTALLATION
 
 To install this module, run the following commands:
 
@@ -21,12 +38,15 @@ To install this module, run the following commands:
 	make test
 	make install
 
-SUPPORT AND DOCUMENTATION
+or install directly from CPAN as
+	cpan Bio::CUA
+
+4. SUPPORT AND DOCUMENTATION
 
 After installing, you can find documentation for this module with the
 perldoc command.
 
-    perldoc Bio::CUA::CUB::Builder
+    perldoc Bio::CUA
 
 You can also look for information at:
 
@@ -43,7 +63,7 @@ You can also look for information at:
         http://search.cpan.org/dist/Bio-CUA/
 
 
-LICENSE AND COPYRIGHT
+5. LICENSE AND COPYRIGHT
 
 Copyright (C) 2015 Zhenguo Zhang
 

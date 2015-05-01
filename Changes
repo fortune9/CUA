@@ -1,5 +1,6 @@
 Revision history for Bio-CUA
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+1.01    Thu Apr 30 16:51:09 EDT 2015
+        First version, including methods to calculate codon usage bias
+		indice at both codon and sequence levels.
 
