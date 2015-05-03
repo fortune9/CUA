@@ -480,7 +480,7 @@ RSCUs of this amino acid's codons are divided by 0.25.
 If option C<--background> is activated, the 'background-normalization'
 method always uses the I<max> method to get final CAIs. 
 
-=iem -o/--out-file
+=item -o/--out-file
 
 file to store the result. Default is standard output, usually screen.
 

@@ -6,11 +6,13 @@ ignore.txt
 lib/Bio/CUA.pm
 lib/Bio/CUA/CodonTable.pm
 lib/Bio/CUA/CUB.pm
+lib/Bio/CUA/CUB/.Calculator.pm.swp
 lib/Bio/CUA/CUB/Calculator.pm
 lib/Bio/CUA/Seq.pm
 lib/Bio/CUA/SeqIO.pm
 lib/Bio/CUA/Summarizer.pm
 MANIFEST			This list of files
+MANIFEST.SKIP
 README
 t/00-load.t
 t/01-seqio.t

@@ -17,3 +17,7 @@ pm_to_blib
 Bio-CUA-*
 Bio-CUA-*.tar.gz
 .git/
+generate_expected_data.pl
+.bak
+.git*
+MANIFEST.SKIP
