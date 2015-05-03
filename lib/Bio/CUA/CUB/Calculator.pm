@@ -377,19 +377,18 @@ sub enc
 
  Title   : enc_r
  Usage   : $encValue = $self->enc_r($seq,[$minTotal]);
- Function: similar to the method L</enc>, except that calculating the
- missing F values using a different way, relying on the relationship
- of homozygosity and degree of degeneracy.
+ Function: similar to the method L</enc>, except that missing F values
+ are estimated in a different way.
  Returns : a number, or undef if failed
  Args    : for sequence see L</"sequence input">.
  Optional argument I<minTotal> specifies minimal count 
  for an amino acid; if observed count is smaller than this count, this
  amino acid's F will not be calculated but inferred. Deafult is 5.
 
- Note: its difference from method L</enc> is to estimate missing Fr
- using equal_ratio algorithm, that is the estimate Fx satisfying the
- following equation: (1/Fx)/x=[sum(1/Fr) over r]/[sum(r) over r] where
- x and r marks groups with unknown and known F values, respectively.
+ Note: for missing Fx of degeneracy class 'x', we first estimated the
+ ratio (1/Fx-1)/(x-1) by averaging the ratios of other degeneracy
+ classes with known F values. Then Fx is obtained by solving the simple
+ equation.
 
 =cut
 
@@ -431,9 +430,8 @@ sub encp
  Title   : encp_r
  Usage   : $encpValue =
  $self->encp_r($seq,[$minTotal,[$A,$T,$C,$G]]);
- Function: similar to the method L</encp>, except that calculating the
- missing F values using a different way, considering the
- redundancy degree of each class.
+ Function: similar to the method L</encp>, except that missing F values
+ are estimated using a different way.
  Returns : a number, or undef if failed
  Args    : for sequence see L</"sequence input">.
  
@@ -446,10 +444,10 @@ sub encp
  default one provided when calling the method L</new>. If stil
  unavailable, error occurs.
 
- Note: its difference from method L</encp> is to estimate missing Fr
- using equal_ratio algorithm, that is the estimate Fx satisfying the
- following equation (1/Fx)/x=[sum(1/Fr) over r]/[sum(r) over r] where
- x and r label unknown and known degeneracy groups, respectively.
+ Note: for missing Fx of degeneracy class 'x', we first estimated the
+ ratio (1/Fx-1)/(x-1) by averaging the ratios of other degeneracy
+ classes with known F values. Then Fx is obtained by solving the simple
+ equation.
 
 =cut
 
