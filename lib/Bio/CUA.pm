@@ -31,7 +31,9 @@ L<Bio::CUA::Summarizer>, L<Bio::CUA::CUB::Builder>.
 =head1 DESCRIPTION
 
 The aim of this distribution is to provide comprehensive and flexible
-tools to analyze codon usage bias (CUB) and relevant problems. 
+tools to analyze codon usage bias (CUB) and relevant problems, so that
+users can speed up the genetic research by taking advantage of this
+convenience.
 
 One amino acid can be encoded by more than one synonymous codon, and
 synonymous codons are unevenly used. For example, some codons are used

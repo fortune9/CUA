@@ -7,6 +7,7 @@ use Bio::CUA::CUB::Calculator;
 use Bio::CUA::CodonTable;
 use Getopt::Long;
 
+our $VERSION = 0.01;
 my @args = @ARGV;
 my $sep = "\t";
 my $seqIO_pkg;
@@ -31,17 +32,20 @@ my $taiFile;
 my $caiFile;
 my $encMethods;
 my $baseCompFile;
+my $help;
 
 GetOptions(
-	'gc-id:i'     => \$gcId,
-	'tai-param:s' => \$taiFile,
-	'cai-param:s' => \$caiFile,
-	'enc-methods:s' => \$encMethods,
-	'out:s' => \$outFile,
-	'base-comp:s'	=> \$baseCompFile
+	's|seq-file=s'  => \$seqFile,
+	'g|gc-id:i'     => \$gcId,
+	't|tai-param:s' => \$taiFile,
+	'c|cai-param:s' => \$caiFile,
+	'e|enc-methods:s' => \$encMethods,
+	'o|out-file:s' => \$outFile,
+	'b|base-comp:s'	=> \$baseCompFile,
+	'h|help!'     => \$help
 );
 
-$seqFile = shift or &usage();
+&usage() if($help or !defined($seqFile));
 
 $gcId ||= 1;
 $outFile ||= '-';
@@ -151,40 +155,209 @@ sub _format_num
 sub usage
 {
 	print <<USAGE;
-Usage: $0 [options] <seq-file>
+Usage: $0 [options]
 
-This program can read into sequences from fasta-formated file
-<seq-file> and output information of each sequence, including amino
-acid composition, codon usage bias (ENC, CAI, tAI, Fop, etc), GC
-content.
+This program computes CUB indices and additional sequence statistics
+for each sequence. Available CUB indices are ENC, CAI, tAI, Fop.
 
 Options:
 
---gc-id:  genetic code table ID used for deriving amino acids for
+-s/--seq-file: file containing sequences in fasta format, from which
+CUB indices are computed.
+
+-g/--gc-id:  genetic code table ID used for deriving amino acids for
 sequences in input file. Default is 1, i.e., standard table
 
---tai-param:  the file containing tAI values for each codon in the
+-t/--tai-param:  the file containing tAI values for each codon in the
 format 'codon<tab>tAI_value'. If not provided, tAI values would not be
 computed.
 
---cai-param: similar to --tai-param, except for CAI values.
+-c/--cai-param: similar to --tai-param, except for CAI values.
 
---enc-methods: what methods to be used to calculate ENC (codon usage
-bias). Available values are enc, enc_r, encp, and encp_r, Check module
-Bio::CUA::CUB::Calculator to see what each method does. Default is
-enc. One can specify more than one method such as 'enc,encp,enc_r'.
+-e/--enc-methods: methods for ENC calculation. Available values are 
+enc, enc_r, encp, and encp_r.
 
---base-comp: background base compositions in the format of 
+-b/--base-comp: a file containing background base compositions for
+each sequence in the following format: 
 seq_id	#A	#T	#C	#G
-where #A/#T/#C/#G are counts or fractions of bases in background data
-such as introns. This option is mandatory if --enc-methods has
-arguments 'encp' or 'encp_r'. One line per sequence. For sequences
-mising this information, an 'NA' will be returned for corresponding enc
-values.
+This option is needed when computing encp* versions of ENC.
 
---out:  the file to store the results. Default is to standard output.
+-o/--out:  the file to store the results. Default is to standard output.
+
+-h/--help: show this message. For more details, run 
+'perldoc calculate_CUB.pl'
+
+Author:  Zhenguo Zhang
+Contact: zhangz.sci\@gmail.com
+Created:
+Sat May  2 22:22:07 EDT 2015
+
 
 USAGE
 	
 	exit 1;
 }
+
+=pod
+
+=head1 NAME
+
+calculate_CUB.pl - a program to calculate sequence codon usage bias
+indices and other sequence parameters.
+
+=head1 VERSION
+
+VERSION: 0.01
+
+=head1 SYNOPSIS
+
+This program computes CUB indices for each sequence; the types of
+computed CUB indices depend on the provided options (see below).
+
+In addition to CUB indices, the program also computes some other
+features such as counts of amino acids, GC-content of the whole
+sequence and the 3rd codon positions.
+
+  # compute ENC, ENC_r, CAI, and tAI for each sequence in file cds.fa
+  summarize_cds_stat.pl --cai CAI_param.top_200 --tai tAI_param \
+  --enc enc,enc_r --seq cds.fa -o CUB_indice.tsv
+
+=head1 OPTIONS
+
+=head3 Mandatory options
+
+=over
+
+=item -s/--seq-file
+
+file containing sequences in fasta format, from which each sequence's
+CUB indices are computed.
+
+=back
+
+=head3 Auxiliary options
+
+=over
+
+=item -g/--gc-id
+
+ID of genetic code table used for identifying amino acid encoded by
+each codon. Default is 1, i.e., standard code. See L<NCBI Genetic
+Code|http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi?mode=t>
+for valid IDs.
+
+=item -t/--tai-param
+
+file containing tAI value for each codon in the
+format 'codon<tab>tAI_value', which can be produced by
+L<build_tai_param.pl>. If not given, tAI values would not be
+computed.
+
+=item -c/--cai-param
+
+similar to --tai-param, except that CAI values are
+provided in the same format. This file may be produced by
+L<build_cai_param.pl>. If not given, CAI values would not be computed.
+
+=item -e/--enc-methods
+
+methods for ENC calculations. Available values are I<enc>, I<enc_r>,
+I<encp>, and I<encp_r>. I<encp*> versions corrects background
+GC-content in calculations. I<*_r> versions uses a new method to
+estimate missing F values. Check module L<Bio::CUA::CUB::Calculator>
+to see details of these methods. Default is I<enc>. Multiple methods
+can be specified as comma-separated string such as 'enc,encp,enc_r'.
+
+=item -b/--base-comp
+
+background base compositions used for correcting GC content in ENC
+calculations. This option has no effect unless I<encp*> version
+methods are specified in I<--enc-methods>.
+
+the format is like this:
+
+	seq_id1	#A	#T	#C	#G
+	seq_id2	#A	#T	#C	#G
+	...   ...
+
+where #A/#T/#C/#G are counts or fractions of each base type in background data
+(e.g., introns) for each sequence. For sequences without background
+base composition information, 'NA' will be returned for I<encp*>
+methods.
+
+=item -o/--out-file
+
+the file to store the results. Default is to standard output, usually
+screen.
+
+=item -h/--help
+
+show the brief help message. 
+
+=back
+
+=head1 AUTHOR
+
+Zhenguo Zhang, C<< <zhangz.sci at gmail.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-bio-cua at
+rt.cpan.org> or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bio-CUA>.  I will be
+notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=cut
+
+=head1 SUPPORT
+
+You can find documentation for this class with the perldoc command.
+
+	perldoc Bio::CUA
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-CUA>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Bio-CUA>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Bio-CUA>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Bio-CUA/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2015 Zhenguo Zhang.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut
+

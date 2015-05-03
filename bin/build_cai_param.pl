@@ -1,11 +1,5 @@
 #!/usr/bin/env perl
 
-=pod
-
-a pod test in script
-
-=cut
-
 use strict;
 use warnings;
 use lib '../lib';
@@ -15,6 +9,7 @@ use Getopt::Long;
 use Fcntl qw/:seek/;
 use File::Sort qw/sort_file/;
 use File::Temp qw/ tempfile tempdir /;
+our $VERSION = 0.01;
 
 my $seqIO_pkg;
 
@@ -41,18 +36,20 @@ my $background;
 my $normMethod;
 my $minTotal; # the minimal count of an amino acid for being
 # considered to calculate CAI parameters
+my $help;
 
 GetOptions(
-	'seq-file=s'  => \$seqFile,
-	'exp-file:s'  => \$expFile,
-	'select:s'  => \$select,
-	'background:s'  => \$background,
-	'out-file:s'  => \$outFile,
-	'gc-id:i'  => \$gcId,
-	'method:s' => \$normMethod
+	'i|seq-file=s'  => \$seqFile,
+	'e|exp-file:s'  => \$expFile,
+	's|select:s'  => \$select,
+	'b|background:s'  => \$background,
+	'o|out-file:s'  => \$outFile,
+	'g|gc-id:i'  => \$gcId,
+	'm|method:s' => \$normMethod,
+	'h|help!'   => \$help
 );
 
-&usage() unless($seqFile);
+&usage() if($help or !defined($seqFile));
 
 if($select)
 {
@@ -318,64 +315,42 @@ sub usage
 Usage: $0 [options]
 
 This program reads into fasta-formatted sequences and ouput CAI values
-for each codon. These input sequences are supposed to be highly
-expressed genes in an organism and thus presumably use efficient codons.
+for each codon. 
 
 Mandatory options:
 
---seq-file:  a file containing sequences in fasta format
+-s/--seq-file: a file containing protein-coding sequences in fasta
+format
 
 Auxiliary options:
 
---exp-file:  a file containing a list of sequence IDs with one ID per
-line, and optionally each ID followed by sequence expression levels.
-The two fields are separated by <tab>. See option --select how this
-file affects the program's process.
+-e/--exp-file: a file containing sequence IDs and their expression
 
---select:  determine how sequences are selected from sequence file.
-Available values are as follows:
-	all  = all sequences with IDs in the expression file given by --exp-file
-	0.## = a fraction such as 0.30, then top 30% sequences in the
-	expression file ranked after gene expression (from high to low) are 
-	selected for CAI calculation.
-	
-	###  = an integer such as 200, then the top 200 sequences (based on
-	gene expression rank) in the expression file are selected for CAI
-	calculation
-	
-	Default is 'all'.
-	Note: the sequence IDs must match sequence IDs in the sequence file to
-	be able to select those sequences.
+-s/--select:  how many sequences are chosen for CAI calculation.
+all  = all IDs in the expression file given by --exp-file
+0.## = the top fraction of highly expressed genes, say 0.30, then top
+30% highly expressed genes.
+###  = an integer such as 200, then the top 200 highly expressed
+genes.
+Default is 'all'.
 
---background: specify the background data such as lowly expressed
-genes from which the background codon usage is derived. This argument
-is optional, but if provided, 'background-normalization' method is
-used, see below for details.
-Acceptable values are as follows:
-	0.## = a fraction such as 0.30, then bottom 30% sequences in the
-	expression file ranked after gene expression (from high to low).
-	
-	###  = an integer such as 200, then the bottom 200 sequences (based on
-	#gene expression rank) in the expression file are selected.
-	filename = a file containing protein-coding sequences which will be
-	parsed for background codon usage.
+-b/--background: data for background codon usage estimation.
+0.## = a fraction (e.g.,0.30) of most lowly expressed genes in the
+expression file by --exp-file
+###  = a number (say 200) of most lowly expressed genes in the
+expression file.
+filename = a file containing protein-coding sequences which will be
+anlyzed for background codon usage.
 
---gc-id:  id of genetic code table. See NCBI genetic code
-http://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/index.cgi?chapter=cgencodes
-for valid IDs. Default is 1, i.e., standard genetic code.
+-g/--gc-id:  ID of genetic code table. 
 
---method: the method to normalize CAI values of synonymous codons of
-the same amino acid. Default is 'max'; the alternatives are 'mean' or
-'background-normalization'. 
-The 'max' method is the one used by <Sharp and Li, 1987, NAR>. 
-'mean' divides each codon's RSCU by its expectation under even usage 
-of synonymous codons. For example, for an amino acid with four synymous 
-codons, the expectation is 0.25 for each synonymous codon.
-'background-normalization' divides each codon's RSCU by the
-corresponding RSCU from backgound sequence data, then these normalized
-RSCU values follows the 'max' method to derive CAI values.
+-m/--method: method to calculate CAI. Available values are 'max'
+(default) and 'mean'.
 
---out-file: the file to store the result. Default is standard output.
+-o/--out-file: the file to store the result. Default is standard output.
+
+-h/--help: show this help message. For more detailed information, run
+'perldoc build_cai_param.pl'
 
 Author:  Zhenguo Zhang
 Contact: zhangz.sci\@gmail.com
@@ -386,3 +361,193 @@ USAGE
 	
 	exit 1;
 }
+
+=pod
+
+=head1 NAME
+
+build_cai_param.pl - a program to calculate CAI for codons
+
+=head1 VERSION
+
+VERSION = 0.01
+
+=head1 SYNOPSIS
+
+This is a program to compute CAI at codon level with different
+methods. It is part of distribution
+L<http://search.cpan.org/dist/Bio-CUA/>
+
+# calculate codon CAI by choosing the top 200 highly expressed genes
+build_cai_param.pl -i seqs.fasta -e gene_expression.tsv -s 200 -o CAI_top200
+
+# the same as above but normalize RSCUs with expected RSCUs under even
+# codon usage
+build_cai_param.pl -i seqs.fasta -e gene_expression.tsv -s 200 -o CAI_top200.by_mean -m mean
+
+# normalize RSCUs by RSCUs derived from bottom 1000 lowely expressed genes
+build_cai_param.pl -i seqs.fasta -e gene_expression.tsv -s 200 -o CAI_top200.b1000 -b 1000
+
+=head1 OPTIONS
+
+All options have a short and a long forms, e.g., -i and --seq-file for
+first option.
+
+In the following text, RSCU stands for relative synonymous codon
+usage.
+
+=head3 Mandatory options
+
+=over
+
+=item -i/--seq-file
+
+a file containing protein-coding sequences in fasta format.
+
+=back
+
+=head3 Auxiliary options
+
+=over
+
+=item -e/--exp-file
+
+a file containing sequence IDs and their expression in the forllowing
+format:
+
+	seq-id1E<lt>tabE<gt>0.67
+	seq-id2E<lt>tabE<gt>2.57
+	... ...
+
+each line contains one sequence ID and the sequence's gene expression
+level (RNA, protein, or else), separated by tab. The sequence IDs
+must match the IDs in the sequence file specified above.
+
+From this file, highly expressed genes will be selected according to
+the gene expression rank. See below options.
+
+If this option is omitted, all the sequences in the above sequence
+file would be used for calculating CAIs.
+
+=item -s/--select
+
+determine how many sequences are chosen from the above expression
+file (by option --exp-file). Available formats are: 
+
+I<all>, all IDs in the expression file are chosen.
+
+I<0.##>, a fraction of top highly expressed genes, say 0.30, then top
+30% highly expressed genes are chosen.
+
+I<###>, an integer, say 200, then the top 200 highly expressed genes
+are chosen.
+
+Default is I<all>. If the option --exp-file is omitted, this option
+has no effect.
+
+=item -b/--background
+
+specify background data (e.g., lowly expressed
+genes) from which the background codon usage is derived. Then each
+codon's RSCU from highly expressed genes is divided by the codon's
+RSCU from the background data; these normalized RSCUs are used for CAI
+calculation. This method is termed 'background-normalization'.
+
+How to specify background data: I<0.##>, I<###>, or I<filename>, the
+former two formats choose a fraction
+of or a number of genes from the most lowly expressed genes specified
+in the expression file by --exp-file. See option --select for details
+of the two specification formats. The last format specifies a
+fasta-formatted sequence file from which background codon usage is
+calculated.
+
+=item -g/--gc-id
+
+ID of genetic code table. See L<NCBI genetic code|
+http://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/index.cgi?chapter=cgencodes>
+for valid IDs. Default is 1, i.e., standard genetic code.
+
+=item -m/--method
+
+method to calculated CAI: I<max> or I<mean>.
+The former is used by <Sharp and Li, 1987, NAR>, in which each codon's
+RSCU is divided by the maximum of all synonymous codons to derive CAI.
+The 'mean' method divides each codon's RSCU by the expected RSCU under
+even codon usage to get CAI. For example, for an amino acid with four synonymous 
+codons, the expected RSCU is 0.25 for each codon, so all observed
+RSCUs of this amino acid's codons are divided by 0.25.
+
+If option C<--background> is activated, the 'background-normalization'
+method always uses the I<max> method to get final CAIs. 
+
+=iem -o/--out-file
+
+file to store the result. Default is standard output, usually screen.
+
+=back
+
+=head1 AUTHOR
+
+Zhenguo Zhang, C<< <zhangz.sci at gmail.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-bio-cua at
+rt.cpan.org> or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bio-CUA>.  I will be
+notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=cut
+
+=head1 SUPPORT
+
+You can find documentation for this class with the perldoc command.
+
+	perldoc Bio::CUA
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-CUA>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Bio-CUA>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Bio-CUA>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Bio-CUA/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2015 Zhenguo Zhang.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut
+

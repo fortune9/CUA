@@ -72,6 +72,8 @@ use Bio::CUA::CodonTable;
 
  B<options needed by FOP method>
 
+=over
+
 =item C<-optimal_codons>
 
  a file contains all the optimal codons, one codon per line. Or a
@@ -80,6 +82,8 @@ use Bio::CUA::CodonTable;
 =back
 
  B<options needed by CAI method>
+
+=over
 
 =item C<-CAI_values>
 
@@ -94,7 +98,7 @@ use Bio::CUA::CodonTable;
 
  B<options needed by tAI method>
 
-=back
+=over
 
 =item C<-tAI_values>
 
@@ -104,6 +108,8 @@ use Bio::CUA::CodonTable;
 =back
 
  B<options needed by ENC method>
+
+=over
 
 =item C<-base_background>
 
@@ -628,20 +634,21 @@ sub _estimate_F
 
 	return 1 if($redundancy == 1);
 
-	if($equalRatio) # considering the redundancy difference among classes
+	if($equalRatio) # get the mean (1/Fr-1)/(r-1)
 	{
-		my $redundancySum = 0;
-		my $FrecSum = 0; # sum of reciprocals of F
+		my $ratioSum;
+		my $cnt = 0; # number of known Fs
 		while(my ($r, $F) = each %$knownF)
 		{
 			next if $r < 2; # excluding class of redundancy==1
-			$redundancySum += $r;
-			$FrecSum += 1/$F;
+			$ratioSum += (1/$F-1)/($r-1);
+			$cnt++;
 		}
 
-		if($redundancySum > 0)
+		if( $cnt > 0)
 		{
-			return $redundancySum/$FrecSum/$redundancy;
+			my $Fx = 1/($ratioSum/$cnt*($redundancy-1)+1);
+			return $Fx;
 		}else # no known F for any class with redundancy > 1
 		{
 			return undef;

@@ -109,6 +109,7 @@ my %defaultSC = (
  Args    : accepted options are as follows
 
  B<options needed for building parameters of all CUB indice>
+
 =over
 
 =item C<-codon_table>
@@ -121,6 +122,7 @@ L<Bio::CUA::Summarizer/new> for details.
 =back
 
  B<options needed for building tAI index's parameters>
+
 =over
 
 =item C<-a_to_i>

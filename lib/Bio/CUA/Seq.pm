@@ -59,6 +59,8 @@ the sequence name
 
 extra description of this sequence
 
+=back
+
 =cut
 
 sub new
