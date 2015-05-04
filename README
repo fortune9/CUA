@@ -13,20 +13,26 @@ more often than other synonymous ones in highly expressed genes
 (I<Sharp and Li 1987>). To measure the unevenness of codon usage, multiple
 indices of codon usage bias have been developed, such as Fop
 (Frequency of optimal codons), CAI (Codon Adaptation Index), tAI (tRNA
-Adaptation Index), and ENC (Effective Number of Codons). The causes of
-CUB phenomena are complicated, including, mutational bias, selection
-on translational efficiency or accurancy. CUB is one fundamental concept
-in genetics.
+Adaptation Index), and ENC (Effective Number of Codons). Biased codon
+usage is widespread, visible in all species. It is important both to
+identify codons having high translational efficiency (often named
+optimal codons) and to study the distribution of codon usage among
+genes (e.g., genes with more optimal codons versus genes with fewer
+optimal codons).
 
 So far, no software exists to compute all the above CUB indices, and
-worse is that parameters of CUB calculations are often fixed in
-software, so one can only analyze genes in a limited list of species
-and one can not incorporate its own parameters such as sequences of
-highly expressed genes in a tissue.
+it is worse that parameters in existing software are often fixed,
+so one can compute certain types of CUB indices for a limited list of 
+species and can not modify parameters. For example, when one wants to
+identify optimal codons in certain tissues, it may be better to use
+most highly expressed genes to calculate CAI index, which is
+impossible with existing software.
 
-This package mainly solves these two problems. We also extend some
-methods, such as GC-content corrected ENC, background-data normalized
-CAI, etc. See the relevant methods in CUB classes for more details.
+This package mainly solves these two problems: providing tools
+computing all common CUB indices and allowing users to tune parameters
+freely. We also incorporate or extend some method variants, such as 
+GC-content corrected ENC, background-data normalized CAI, etc. 
+See the relevant methods' description in CUB classes for more details.
 
 
 3. INSTALLATION
@@ -62,6 +68,8 @@ You can also look for information at:
     Search CPAN
         http://search.cpan.org/dist/Bio-CUA/
 
+
+You can also email me at zhangz.sci@gmail.com for help.
 
 5. LICENSE AND COPYRIGHT
 
