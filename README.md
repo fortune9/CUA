@@ -1,9 +1,11 @@
 1. Bio-CUA
- Version: 1.01
+
+Version: 1.01
 
 2. Purpose
- The aim of this distribution is to provide comprehensive and flexible
- tools to analyze codon usage bias (CUB) and relevant problems.
+
+The aim of this distribution is to provide comprehensive and flexible
+tools to analyze codon usage bias (CUB) and relevant problems.
 
 One amino acid can be encoded by more than one synonymous codon, and
 synonymous codons are unevenly used. For example, some codons are used
