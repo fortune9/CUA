@@ -1,9 +1,7 @@
-1. Bio-CUA
-
+##1. Bio-CUA  
 Version: 1.01
 
-2. Purpose
-
+##2. Purpose  
 The aim of this distribution is to provide comprehensive and flexible
 tools to analyze codon usage bias (CUB) and relevant problems.
 
@@ -87,5 +85,5 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+along with this program.  If not, see http://www.gnu.org/licenses/.
 
