@@ -46,7 +46,7 @@ or install directly from CPAN as
 	
 	cpan Bio::CUA
 
-4. SUPPORT AND DOCUMENTATION
+##4. SUPPORT AND DOCUMENTATION
 
 After installing, you can find documentation for this module with the
 perldoc command.
@@ -70,7 +70,7 @@ You can also look for information at:
 
 You can also email me at zhangz.sci@gmail.com for help.
 
-5. LICENSE AND COPYRIGHT
+##5. LICENSE AND COPYRIGHT
 
 Copyright (C) 2015 Zhenguo Zhang
 
