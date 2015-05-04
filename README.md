@@ -1,9 +1,7 @@
 1. Bio-CUA
-
 Version: 1.01
 
 2. Purpose
-
 The aim of this distribution is to provide comprehensive and flexible
 tools to analyze codon usage bias (CUB) and relevant problems.
 
