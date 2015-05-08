@@ -319,7 +319,7 @@ for each codon.
 
 Mandatory options:
 
--s/--seq-file: a file containing protein-coding sequences in fasta
+-i/--seq-file: a file containing protein-coding sequences in fasta
 format
 
 Auxiliary options:
