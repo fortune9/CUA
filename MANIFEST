@@ -7,9 +7,11 @@ lib/Bio/CUA.pm
 lib/Bio/CUA/CodonTable.pm
 lib/Bio/CUA/CUB.pm
 lib/Bio/CUA/CUB/Calculator.pm
+lib/Bio/CUA/CUB/Builder.pm
 lib/Bio/CUA/Seq.pm
 lib/Bio/CUA/SeqIO.pm
 lib/Bio/CUA/Summarizer.pm
+LICENSE
 MANIFEST			This list of files
 README
 t/00-load.t
@@ -28,3 +30,4 @@ t/tai.out
 t/test.fa
 TODO
 xt/boilerplate.t
+Makefile.PL

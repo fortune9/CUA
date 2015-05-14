@@ -14,8 +14,7 @@ my $sep = "\t";
 
 =head1 NAME
 
-Bio::CUA - the root class for the whole distribution of
-L<http://search.cpan.org/dist/Bio-CUA/>
+Bio::CUA - Codon Usage Analyzer.
 
 =head1 VERSION
 
@@ -23,7 +22,9 @@ Version 1.01
 
 =head1 SYNOPSIS
 
-This class provides some routine methods used by all classs in the
+This is the root class for the whole distribution of
+L<http://search.cpan.org/dist/Bio-CUA/>,
+providing some routine methods used by all classs in the
 distribution L<http://search.cpan.org/dist/Bio-CUA/>. Users should not use this class
 directly. Please start with its child classes such as
 L<Bio::CUA::Summarizer>, L<Bio::CUA::CUB::Builder>.
