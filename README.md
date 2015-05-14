@@ -1,7 +1,9 @@
-##1. Bio-CUA  
+##1. Bio-CUA
+
 Version: 1.01
 
-##2. Purpose  
+##2. Purpose
+
 The aim of this distribution is to provide comprehensive and flexible
 tools to analyze codon usage bias (CUB) and relevant problems.
 
@@ -9,25 +11,25 @@ One amino acid can be encoded by more than one synonymous codon, and
 synonymous codons are unevenly used. For example, some codons are used
 more often than other synonymous ones in highly expressed genes
 (I<Sharp and Li 1987>). To measure the unevenness of codon usage, multiple
-indices of codon usage bias have been developed, such as Fop
+metrics of codon usage bias have been developed, such as Fop
 (Frequency of optimal codons), CAI (Codon Adaptation Index), tAI (tRNA
 Adaptation Index), and ENC (Effective Number of Codons). Biased codon
 usage is widespread, visible in all species. It is important both to
-identify codons having high translational efficiency (often named
+identify codons having high translational efficiency (often termed
 optimal codons) and to study the distribution of codon usage among
 genes (e.g., genes with more optimal codons versus genes with fewer
 optimal codons).
 
-So far, no software exists to compute all the above CUB indices, and
-it is worse that parameters in existing software are often fixed,
-so one can compute certain types of CUB indices for a limited list of 
-species and can not modify parameters. For example, when one wants to
+So far, no software implements all the above CUB metrics in one place.
+More importantly, parameters in existing software are often fixed,
+so one can compute certain types of CUB metrics for a limited list of 
+species and cannot tune parameters. For example, when one wants to
 identify optimal codons in certain tissues, it may be better to use
-most highly expressed genes to calculate CAI index, which is
+most highly expressed genes of that tissue to calculate CAI, which is
 impossible with existing software.
 
 This package mainly solves these two problems: providing tools
-computing all common CUB indices and allowing users to tune parameters
+computing all common CUB metrics and allowing users to tune parameters
 freely. We also incorporate or extend some method variants, such as 
 GC-content corrected ENC, background-data normalized CAI, etc. 
 See the relevant methods' description in CUB classes for more details.
@@ -37,13 +39,15 @@ See the relevant methods' description in CUB classes for more details.
 
 To install this module, run the following commands:
 
+a. If install after downloading the package,
+
 	perl Makefile.PL
 	make
 	make test
 	make install
 
-or install directly from CPAN as
-	
+b. install directly from CPAN as
+
 	cpan Bio::CUA
 
 ##4. SUPPORT AND DOCUMENTATION
@@ -85,5 +89,10 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see http://www.gnu.org/licenses/.
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+##6. CITATION
+
+Zhenguo Zhang and Daven C. Presgraves, CUA: a Flexible Codon Usage
+Analyzer (In preparation)
 

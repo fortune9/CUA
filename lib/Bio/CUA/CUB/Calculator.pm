@@ -31,10 +31,10 @@ Bio::CUA::CUB::Calculator -- A module to calculate codon usage bias
 
 Codon usage bias (CUB) can be represented at two levels, codon and
 sequence. The latter is often computed as the geometric means of the
-sequence's codons. This module caculates CUB indices at sequence
+sequence's codons. This module caculates CUB metrics at sequence
 level.
 
-Supported CUB indices include CAI (codon adaptation index), tAI (tRNA
+Supported CUB metrics include CAI (codon adaptation index), tAI (tRNA
 adaptation index), Fop (Frequency of optimal codons), ENC (Effective
 Number of Codons) and their variants. See the methods below for
 details.

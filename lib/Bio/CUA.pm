@@ -39,15 +39,15 @@ One amino acid can be encoded by more than one synonymous codon, and
 synonymous codons are unevenly used. For example, some codons are used
 more often than other synonymous ones in highly expressed genes (I<Sharp
 and Li 1987>). To measure the unevenness of codon usage, multiple
-indices of codon usage bias have been developed, such as Fop
+metrics of codon usage bias have been developed, such as Fop
 (Frequency of optimal codons), CAI (Codon Adaptation Index), tAI (tRNA
 Adaptation Index), and ENC (Effective Number of Codons). The causes of
 CUB phenomena are complicated, including, mutational bias, selection on 
 translational efficiency or accurancy. CUB is one fundamental concept
 in genetics. 
 
-So far, no software exists to compute all the above CUB indices, and
-worse is that parameters of CUB calculations are often fixed in
+So far, no software exists to compute all the above CUB metrics, and
+more importantly parameters of CUB calculations are often fixed in
 software, so one can only analyze genes in a limited list of species
 and one can not incorporate its own parameters such as sequences of
 highly expressed genes in a tissue. 

@@ -5,7 +5,7 @@ package Bio::CUA::CUB::Builder;
 =head1 NAME
 
 Bio::CUA::CUB::Builder -- A module to calculate codon usage bias (CUB)
-indices at codon level and other parameters
+metrics at codon level and other parameters
 
 =head1 SYNOPSIS
 
@@ -31,9 +31,9 @@ indices at codon level and other parameters
 
 Codon usage bias (CUB) can be represented at two levels, codon and
 sequence. The latter is often computed as the geometric means of the
-sequence's codons. This module caculates CUB indices at codon level.
+sequence's codons. This module caculates CUB metrics at codon level.
 
-Supported CUB indices include CAI (codon adaptation index), tAI (tRNA 
+Supported CUB metrics include CAI (codon adaptation index), tAI (tRNA 
 adaptation index), RSCU (relative synonymous codon usage), and their
 variants. See the methods below for details.
 
