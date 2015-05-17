@@ -28,6 +28,7 @@ t/pod-coverage.t
 t/pod.t
 t/tai.out
 t/test.fa
+t/env.pm
 TODO
 xt/boilerplate.t
 Makefile.PL

@@ -4,6 +4,10 @@ use strict;
 use warnings;
 use Test::More;
 use File::Basename;
+use Bio::CUA::SeqIO;
+use File::Spec;
+use lib 't';
+use env;
 
 my $sep = "\t";
 my $seqFile = $ENV{'seq_file'};
@@ -11,8 +15,8 @@ my $expectedFile = $ENV{'expected_file'};
 BAIL_OUT("environment variables NOT found")
 unless($expectedFile and $seqFile);
 my $dir = dirname(__FILE__);
-my $caiFile = "$dir/cai.out";
-my $taiFile = "$dir/tai.out";
+my $caiFile = File::Spec->catfile($dir, "cai.out");
+my $taiFile = File::Spec->catfile($dir, "tai.out");
 
 my $module;
 BEGIN {

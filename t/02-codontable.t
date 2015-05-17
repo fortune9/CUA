@@ -3,6 +3,8 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More;
+use lib 't';
+use env;
 
 # variables
 my $sep = "\t";

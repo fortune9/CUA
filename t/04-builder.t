@@ -4,6 +4,9 @@ use strict;
 use warnings;
 use Test::More;
 use File::Basename;
+use File::Spec;
+use lib 't';
+use env;
 
 # variables
 my $sep = "\t";
@@ -13,8 +16,8 @@ my $tRNAFile = $ENV{'tRNA_file'};
 BAIL_OUT("environment variables NOT found")
 unless($expectedFile and $seqFile and $tRNAFile);
 my $dir = dirname(__FILE__);
-my $caiFile = "$dir/cai.out";
-my $taiFile = "$dir/tai.out";
+my $caiFile = File::Spec->catfile($dir,"cai.out");
+my $taiFile = File::Spec->catfile($dir,"tai.out");
 
 my $module;
 BEGIN {

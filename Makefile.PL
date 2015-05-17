@@ -2,6 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use File::Spec;
 
 WriteMakefile(
     NAME             => 'Bio::CUA',
@@ -55,13 +56,21 @@ package MY; # other content MakeMaker can't produce
 sub postamble
 {
 	# The return will be directly write to makefile
-	my $postamble = <<POST;
-export expected_file = t/expected.tsv
-export seq_file = t/test.fa
-export tRNA_file = t/dmel_r5_apr2006.tRNA_copy
-POST
 
-	return $postamble;
+	# get the command to set environment variables
+#	my $os = $^O;
+#	my $set = $os =~ /MSWin/i? 'set' : 'export';
+#	my $expFile  = File::Spec->catfile('t', 'expected.tsv');
+#	my $seqFile  = File::Spec->catfile('t', 'test.fa');
+#	my $tRNAFile = File::Spec->catfile('t', 'dmel_r5_apr2006.tRNA_copy');
+#
+#	my $postamble = <<POST;
+#export expected_file = $expFile
+#export seq_file = $seqFile
+#export tRNA_file = $tRNAFile
+#POST
+
+#	return $postamble;
 }
 
 # put subroutines here
