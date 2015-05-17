@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 
 # some global variables
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 my $sep = "\t";
 #my @openFHs; # all file handles opened by this class
 
@@ -18,7 +18,7 @@ Bio::CUA - Codon Usage Analyzer.
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
