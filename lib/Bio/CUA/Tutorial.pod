@@ -119,9 +119,9 @@ To calculate CAI, tAI, Fop, and ENC for all the CDS sequences, run
 Note we use the options I<-t>, I<-c>, I<-f>, and I<-e> to specify the
 needed parameters for calculating tAI, CAI, Fop, and ENC.
 
-=head1 CAI and ENC variants
+=head2 CAI and ENC variants
 
-=head2 CAI variants
+=head3 CAI variants
 
 I devise two variants of CAI to fix the shortcoming of the standard
 CAI. Their calculations are below.
@@ -167,7 +167,7 @@ Note I feed the option I<-c> the codon-level bCAI file
 F<codon_CAI.by_background.S2_cell>. I also use the option I<--lite>
 to suppress the program to compute other auxiliary information.
 
-=head2 ENC variants
+=head3 ENC variants
 
 Including the standard ENC, thare are four variants, defined by whether
 nucleotide compositions are corrected and on how missing F values are
