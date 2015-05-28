@@ -492,7 +492,7 @@ sub _enc_factory
 			my $defaultBaseComp = $self->base_composition;
 			unless($defaultBaseComp)
 			{
-				$self->warn("No default base composition for seq"
+				$self->warn("No default base composition for seq",
 				" '$seqId', so no GC-corrected ENC");
 				return undef;
 			}
@@ -816,7 +816,7 @@ sub expect_codon_freq
 	unless($baseComp and ref($baseComp) eq 'ARRAY')
 	{
 		$self->warn("Invalid base composition '$baseComp'",
-		" for expect_codon_freq, which should be an array reference") 
+		" for expect_codon_freq, which should be an array reference");
 		return undef;
 	}
 
