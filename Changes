@@ -1,5 +1,18 @@
 Revision history for Bio-CUA
 
+1.03    Wed May 20 13:25:29 EDT 2015
+        1. Add option --fop-param to calculate_CUB.pl so that the
+		program can compute the metric Fop.
+		2. Reformat the 'usage' information of the scripts in the
+		'bin' directory.
+		3. Add a tutorial file Tutorial.pod.
+
+1.02    Sat May 16 23:04:25 EDT 2015
+        Use a perl module t/env.pm to set environment variables during
+		installation test, replacing the original way of setting
+		environment variables using 'export' in makefile, because the
+		latter does not work for NetBSD/FreeBSD/Windows systems
+
 1.01    Thu Apr 30 16:51:09 EDT 2015
         First version, including methods to calculate codon usage bias
 		indice at both codon and sequence levels.

@@ -7,7 +7,7 @@ use Bio::CUA::CUB::Calculator;
 use Bio::CUA::CodonTable;
 use Getopt::Long;
 
-our $VERSION = 0.01;
+our $VERSION = 0.11;
 my @args = @ARGV;
 my $sep = "\t";
 my $seqIO_pkg;
@@ -30,16 +30,20 @@ my $gcId;
 my $outFile;
 my $taiFile;
 my $caiFile;
+my $fopFile;
 my $encMethods;
 my $baseCompFile;
 my $help;
+my $lite;
 
 GetOptions(
 	's|seq-file=s'  => \$seqFile,
 	'g|gc-id:i'     => \$gcId,
 	't|tai-param:s' => \$taiFile,
+	'f|fop-param:s' => \$fopFile,
 	'c|cai-param:s' => \$caiFile,
 	'e|enc-methods:s' => \$encMethods,
+	'l|lite!'       => \$lite,
 	'o|out-file:s' => \$outFile,
 	'b|base-comp:s'	=> \$baseCompFile,
 	'h|help!'     => \$help
@@ -49,37 +53,46 @@ GetOptions(
 
 $gcId ||= 1;
 $outFile ||= '-';
-$encMethods ||= 'enc';
+#$encMethods ||= 'enc';
 
-my @encs = split ',', $encMethods;
+my @encs = split ',', $encMethods if($encMethods);
 
+# set up parameters for calculating CUB metrics
+my %params; # to CUB analyzer
 my %baseCompositions;
 if(grep /^encp/,@encs) # there are methods needing background data
 {
 	die "option --base-comp is missing for encp and its related methods:$!" 
 	unless($baseCompFile);
-	open(B,"< $baseCompFile") or die "Can not open $baseCompFile:$!";
-	while(<B>)
+	if(-f $baseCompFile) # this is a file
 	{
-		next if /^#/;
-		chomp;
-		my @fields = split "\t";
-		# we may implement checking the validity of the data here in
-		# future
-		$baseCompositions{$fields[0]} = [@fields[1..4]];
+		open(B,"< $baseCompFile") or die "Can not open $baseCompFile:$!";
+		while(<B>)
+		{
+			next if /^#/;
+			chomp;
+			my @fields = split "\t";
+			# we may implement checking the validity of the data here in
+			# future
+			$baseCompositions{$fields[0]} = [@fields[1..4]];
+		}
+		close B;
+	}else # just a comma-separated 4 values
+	{
+		my @baseFreq = split ',', $baseCompFile;
+		die "The length of specified base frequency '$baseCompFile'".
+		" is not 4:$!" unless($#baseFreq == 3);
+		$params{'-base_background'} = \@baseFreq;
 	}
-	close B;
 }
 
 warn "Step 1: build analyzer\n";
 
 my $table = Bio::CUA::CodonTable->new(-id => $gcId) or die $!;
-my %params; # to CUB analyzer
-%params = (
-	-codon_table  => $table,
-);
+$params{'-codon_table'}= $table;
 $params{'-tai_values'} = $taiFile if($taiFile);
 $params{'-cai_values'} = $caiFile if($caiFile);
+$params{'-optimal_codons'} = $fopFile if($fopFile);
 
 my $cub  = Bio::CUA::CUB::Calculator->new(%params) or die $!;
 
@@ -88,49 +101,66 @@ my $io = $seqIO_pkg->new(-file => $seqFile, -format => 'fasta') or die
 "Can't create sequence IO on $seqFile:$!";
 
 open(O, "> $outFile") or die "Can not open $outFile:$!";
-my @header = qw/seq_id length AAs GC GC3/;
-push @header, @encs;
+my @header = qw/seq_id/;
+push @header, qw/length AAs GC GC3/ unless($lite);
+push @header, @encs if(@encs);
 push @header, 'tai' if($taiFile);
 push @header, 'cai' if($caiFile);
+push @header, 'fop' if($fopFile);
 
 my @allAAtypes = sort($table->all_amino_acids); # make the amino acids
 # always in alphabet order
 print O "# produced by $0 @args\n";
-print O "# amino acid order for AAs: ",join(',',@allAAtypes),"\n";
+print O "# amino acid order for AAs: ",join(',',@allAAtypes),"\n"
+unless($lite);
 print O '#', join($sep, @header),"\n";
 my $counter = 0;
 while(my $seq = $io->next_seq)
 {
 	my $codonList = $cub->get_codon_list($seq) or 
 	(warn "Get codons for ".$seq->id." failed\n" and next);
-	my %AAs;
-	my $totalPepLen = 0;
-	while(my ($codon, $cnt) = each %$codonList)
+
+	my @result = ($seq->id);
+	unless($lite)
 	{
-		next if($table->is_stop_codon($codon));
-		my $AA = $table->translate($codon) or 
-		die "Can not translate $codon:$!";
-		$AAs{$AA} += $cnt;
-		$totalPepLen += $cnt;
+		# count amino acids
+		my %AAs;
+		my $totalPepLen = 0;
+		while(my ($codon, $cnt) = each %$codonList)
+		{
+			next if($table->is_stop_codon($codon));
+			my $AA = $table->translate($codon) or 
+			die "Can not translate $codon:$!";
+			$AAs{$AA} += $cnt;
+			$totalPepLen += $cnt;
+		}
+		my $aaCounts = join(',', map { $AAs{$_} || 0 } @allAAtypes);
+
+		# now GC content
+		my $gcFrac = $cub->gc_frac($codonList);
+		my $gc3Frac = $cub->gc_frac($codonList,3);
+
+		# store results
+		push @result, $totalPepLen, $aaCounts;
+		push @result, map {  _format_num($_) } ($gcFrac, $gc3Frac);
 	}
 
-	my $baseComp = $baseCompositions{$seq->id} || 'NA'
+	# get base composition for this sequence if available
+	my $baseComp = $baseCompositions{$seq->id}
 	if(%baseCompositions);
 	# call (codons, minTotal, base composition)
 	# set undef value to NA
-	my @encResult = map { $cub->$_($codonList,undef,$baseComp) || 'NA' } @encs;
+	my @encResult = @encs? 
+	map { $cub->$_($codonList,undef,$baseComp) || 'NA' } @encs : ();
+	# set ENC which is > 62 to 62
+	push @result, map { ($_ ne 'NA' and $_ > 62)? 62 : _format_num($_) } @encResult;
 
-	my $aaCounts = join(',', map { $AAs{$_} || 0 } @allAAtypes);
-	my $gcFrac = $cub->gc_frac($codonList);
-	my $gc3Frac = $cub->gc_frac($codonList,3);
 	my $tai = $cub->tai($codonList) or die $! if($taiFile);
 	my $cai = $cub->cai($codonList) or die $! if($caiFile);
-	my @result = ($seq->id, $totalPepLen, $aaCounts);
-	# set ENC which is > 62 to 62
-	push @result, map { $_ ne 'NA' and $_ > 62? 62 : _format_num($_) } 
-	     ($gcFrac, $gc3Frac, @encResult);
-	push @result, _format_num($tai) if($tai);
-	push @result, _format_num($cai) if($cai);
+	my $fop = $cub->fop($codonList) or die $! if($fopFile);
+	push @result, _format_num($tai) if(defined $tai);
+	push @result, _format_num($cai) if(defined $cai);
+	push @result, _format_num($fop) if(defined $fop);
 
 	print O join($sep, @result),"\n";
 
@@ -174,13 +204,26 @@ computed.
 
 -c/--cai-param: similar to --tai-param, except for CAI values.
 
+-f/--fop-param: a file containing pre-defined optimal codons, one
+codon per line.
+
 -e/--enc-methods: methods for ENC calculation. Available values are 
 enc, enc_r, encp, and encp_r.
 
--b/--base-comp: a file containing background base compositions for
-each sequence in the following format: 
-seq_id	#A	#T	#C	#G
+-b/--base-comp: a file or four numbers separated by comma. When
+provided is a file, it is assumed that sequence-specific background 
+base compositions are given in the format like:
+	seq_id1	#A	#T	#C	#G
+	seq_id2	#A	#T	#C	#G
+	...   ...
+When provided are numbers, it should be like
+	0.2,0.3,0.3,0.2
+giving the frequency of A/T/C/G in order.
 This option is needed when computing encp* versions of ENC.
+
+-l/--lite: in default, the program outputs counts of amino acids, GC
+content, and protein lengths. If this switch option is given, these
+parameters will not be output.
 
 -o/--out:  the file to store the results. Default is to standard output.
 
@@ -203,11 +246,11 @@ USAGE
 =head1 NAME
 
 calculate_CUB.pl - a program to calculate sequence codon usage bias
-indices and other sequence parameters.
+metrics and other sequence parameters.
 
 =head1 VERSION
 
-VERSION: 0.01
+VERSION: 0.11
 
 =head1 SYNOPSIS
 
@@ -221,6 +264,11 @@ sequence and the 3rd codon positions.
   # compute ENC, ENC_r, CAI, and tAI for each sequence in file cds.fa
   summarize_cds_stat.pl --cai CAI_param.top_200 --tai tAI_param \
   --enc enc,enc_r --seq cds.fa -o CUB_indice.tsv
+
+  # the same as above but not output GC content, AA counts and protein
+  # lengths
+  summarize_cds_stat.pl --cai CAI_param.top_200 --tai tAI_param \
+  --enc enc,enc_r --seq cds.fa -o CUB_indice.tsv --lite
 
 =head1 OPTIONS
 
@@ -259,6 +307,12 @@ similar to --tai-param, except that CAI values are
 provided in the same format. This file may be produced by
 L<build_cai_param.pl>. If not given, CAI values would not be computed.
 
+=item -f/--fop-param
+
+a file containing pre-defined optimal codons, one codon per line.
+Optimal codons can be selected using different ways, such as selecting 
+high-tAI codons or those preferred in highly expressed genes.
+
 =item -e/--enc-methods
 
 methods for ENC calculations. Available values are I<enc>, I<enc_r>,
@@ -270,11 +324,16 @@ can be specified as comma-separated string such as 'enc,encp,enc_r'.
 
 =item -b/--base-comp
 
-background base compositions used for correcting GC content in ENC
-calculations. This option has no effect unless I<encp*> version
+This option is needed when computing encp* versions of ENC. The base
+compositions are used as background base compositions to calculate
+expected codon frequency in the sequences. It may be helpful for one
+to exclude the effect of mutational bias on codon usage.
+This option has no effect unless I<encp*> version
 methods are specified in I<--enc-methods>.
 
-the format is like this:
+Acceptable values are either a file or four numbers separated by comma. 
+When provided is a file, it is assumed that sequence-specific background 
+base compositions are given in the format like:
 
 	seq_id1	#A	#T	#C	#G
 	seq_id2	#A	#T	#C	#G
@@ -282,8 +341,20 @@ the format is like this:
 
 where #A/#T/#C/#G are counts or fractions of each base type in background data
 (e.g., introns) for each sequence. For sequences without background
-base composition information, 'NA' will be returned for I<encp*>
+base composition information, 'NA' will be returned from I<encp*>
 methods.
+
+When provided are numbers, it should be like
+	
+	0.2,0.3,0.3,0.2
+
+giving the frequency of A/T/C/G in order.
+
+=item -l/--lite
+
+A switch option. In default, the program outputs counts of amino acids, GC
+content, and protein lengths. If this option is set these parameters will 
+not be output.
 
 =item -o/--out-file
 
@@ -341,6 +412,11 @@ L<http://search.cpan.org/dist/Bio-CUA/>
 
 =head1 ACKNOWLEDGEMENTS
 
+=head1 UPDATES
+
+0.11 - Thu May 21 16:00:28 EDT 2015
+       
+	   1. modify/add option --base-comp and --lite.
 
 =head1 LICENSE AND COPYRIGHT
 

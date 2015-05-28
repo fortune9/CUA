@@ -127,6 +127,8 @@ sub new
 		}
 		last;
 	}
+	$self->warn("option 'codon_table' is missing in the method", 
+		"'new' of $pkg") and return undef unless($codonTable);
 	# store the result
 	$self->{'_codon_table'} = $codonTable;
 

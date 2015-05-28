@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 
 # some global variables
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 my $sep = "\t";
 #my @openFHs; # all file handles opened by this class
 
@@ -18,7 +18,7 @@ Bio::CUA - Codon Usage Analyzer.
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -225,9 +225,12 @@ sub _write_out_hash
 
 	my $fh;
 	open($fh, "> $outFile") or die "Can not open $outFile:$!";
-	while(my ($k,$v) = each %$hashRef)
+	# let's sort the hash so that every time the same order is
+	# produced
+	my @sortedKeys = sort keys(%$hashRef);
+	foreach my $k (@sortedKeys)
 	{
-		print $fh join($sep, $k, $v),"\n";
+		print $fh join($sep, $k, $hashRef->{$k}),"\n";
 	}
 	close $fh;
 

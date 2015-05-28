@@ -165,7 +165,7 @@ sub new
 			}else
 			{
 				$self->throw("Unknown value '$val' for parameter",
-				"-base_composition");
+				"-base_background");
 			}
 		}else
 		{
@@ -466,7 +466,7 @@ sub encp_r
 # F_EstimateMethod: how to estimate average F for a certain redundancy
 # class if that class does not have observed data so can't be
 # calculated; 'mean' is for Wright's method, and 'equal_ratio' for
-# Zhenbguo's method. The latter assumes a similar (1/F[r])/r for each
+# Zhenguo's method. The latter assumes a similar (1/F[r])/r for each
 # redundancy class with redundancy degree 'r'
 # baseComposition: optional, a reference to an array containing
 # background nucleotide composition. If provided, it overides the
@@ -480,7 +480,7 @@ sub _enc_factory
 	
 	# a hash ref, codon => counts
 	my $codonList = $self->get_codon_list($seq) or return;
-
+	my $seqId = (ref($seq) and $seq->can('id'))? $seq->id : '';
 
 	# determine expected codon frequency if necessary
 	my $expectedCodonFreq;
@@ -489,9 +489,13 @@ sub _enc_factory
 	{
 		if(!defined($baseComposition)) # not provided for this sequence
 		{
-			my $defaultBaseComp = $self->base_composition or
-				$self->throw("No base composition information, so can not"
-				,"compute background corrected version of ENC");
+			my $defaultBaseComp = $self->base_composition;
+			unless($defaultBaseComp)
+			{
+				$self->warn("No default base composition for seq"
+				" '$seqId', so no GC-corrected ENC");
+				return undef;
+			}
 			if($defaultBaseComp eq 'seq')
 			{
 				$baseComposition =
@@ -510,7 +514,8 @@ sub _enc_factory
 		# codon frequency may not be estimated due to invalid
 		# compositions
 		$expectedCodonFreq =
-		$self->expect_codon_freq($baseComposition);
+		$self->expect_codon_freq($baseComposition) 
+		if($baseComposition);
 		return undef unless($expectedCodonFreq);
 	}
 
@@ -603,7 +608,7 @@ sub _enc_factory
 		my $AAcntInClass = scalar(keys %$AAHash);
 		if(exists $FavgByClass{$redundancy})
 		{
-			die "$redundancy, $AAcntInClass:$!"
+			die "$redundancy, $AAcntInClass in seq '$seqId':$!"
 			unless($FavgByClass{$redundancy});
 			$enc += $AAcntInClass/$FavgByClass{$redundancy};
 			next;
@@ -615,8 +620,9 @@ sub _enc_factory
 			$equalRatio);
 		unless($estimatedFavg)
 		{
-			$self->warn("Can not estimate average F for class with",
-				"redundancy=$redundancy, probably no known values for this class");
+			$self->warn("Cannot estimate average F for class with",
+				"redundancy=$redundancy in sequence $seqId, ", 
+				"probably no known F values for any class");
 			return undef;
 		}
 		$enc +=  $AAcntInClass/$estimatedFavg;
@@ -807,14 +813,12 @@ sub expect_codon_freq
 {
 	my ($self, $baseComp) = @_;
 
-	if(uc($baseComp) eq 'NA') # for cases the composition is
-	# unavailable
+	unless($baseComp and ref($baseComp) eq 'ARRAY')
 	{
+		$self->warn("Invalid base composition '$baseComp'",
+		" for expect_codon_freq, which should be an array reference") 
 		return undef;
 	}
-
-	$self->throw("Input base composition for expect_codon_freq is not an array reference") 
-	unless($baseComp and ref($baseComp) eq 'ARRAY');
 
 	my @bases = $self->bases;
 	my $compSum = 0; # used to normalize in case they are not summed to 1

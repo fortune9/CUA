@@ -366,7 +366,7 @@ USAGE
 
 =head1 NAME
 
-build_cai_param.pl - a program to calculate CAI for codons
+build_cai_param.pl - a program to calculate CAI for each codon
 
 =head1 VERSION
 
