@@ -11,9 +11,9 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Bio/CUA.pm',
     LICENSE          => 'gpl_3',
 	#PL_FILES         => {'other.PL' => ''}, # files run during compilation 
-	EXE_FILES        => ["bin/build_cai_param.pl",
-	                     "bin/build_tai_param.pl",
-						 "bin/calculate_CUB.pl"
+	EXE_FILES        => ["bin/cai_codon.pl",
+	                     "bin/tai_codon.pl",
+						 "bin/cub_seq.pl"
 	                    ], # files in bin directory
     MIN_PERL_VERSION => 5.006,
     CONFIGURE_REQUIRES => {

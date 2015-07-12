@@ -7,7 +7,7 @@ use Bio::CUA::CUB::Calculator;
 use Bio::CUA::CodonTable;
 use Getopt::Long;
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 my @args = @ARGV;
 my $sep = "\t";
 my $seqIO_pkg;
@@ -187,13 +187,13 @@ sub usage
 	print <<USAGE;
 Usage: $0 [options]
 
-This program computes CUB indices and additional sequence statistics
-for each sequence. Available CUB indices are ENC, CAI, tAI, Fop.
+This program computes CUB metrics and additional sequence statistics
+for each sequence. Available CUB metrics are ENC, CAI, tAI, Fop.
 
 Options:
 
 -s/--seq-file: file containing sequences in fasta format, from which
-CUB indices are computed.
+CUB metrics are computed.
 
 -g/--gc-id:  genetic code table ID used for deriving amino acids for
 sequences in input file. Default is 1, i.e., standard table
@@ -228,7 +228,7 @@ parameters will not be output.
 -o/--out:  the file to store the results. Default is to standard output.
 
 -h/--help: show this message. For more details, run 
-'perldoc calculate_CUB.pl'
+'perldoc cub_seq.pl'
 
 Author:  Zhenguo Zhang
 Contact: zhangz.sci\@gmail.com
@@ -245,30 +245,30 @@ USAGE
 
 =head1 NAME
 
-calculate_CUB.pl - a program to calculate sequence codon usage bias
+cub_seq.pl - a program to calculate sequence codon usage bias
 metrics and other sequence parameters.
 
 =head1 VERSION
 
-VERSION: 0.11
+VERSION: 0.12
 
 =head1 SYNOPSIS
 
-This program computes CUB indices for each sequence; the types of
-computed CUB indices depend on the provided options (see below).
+This program computes CUB metrics for each sequence; the types of
+computed CUB metrics depend on the provided options (see below).
 
-In addition to CUB indices, the program also computes some other
+In addition to CUB metrics, the program also computes some other
 features such as counts of amino acids, GC-content of the whole
 sequence and the 3rd codon positions.
 
   # compute ENC, ENC_r, CAI, and tAI for each sequence in file cds.fa
-  summarize_cds_stat.pl --cai CAI_param.top_200 --tai tAI_param \
-  --enc enc,enc_r --seq cds.fa -o CUB_indice.tsv
+  cub_seq.pl --cai CAI_codon.top_200 --tai tAI_codon \
+  --enc enc,enc_r --seq cds.fa -o CUB_seq.tsv
 
   # the same as above but not output GC content, AA counts and protein
   # lengths
-  summarize_cds_stat.pl --cai CAI_param.top_200 --tai tAI_param \
-  --enc enc,enc_r --seq cds.fa -o CUB_indice.tsv --lite
+  cub_seq.pl --cai CAI_codon.top_200 --tai tAI_codon \
+  --enc enc,enc_r --seq cds.fa -o CUB_seq.tsv --lite
 
 =head1 OPTIONS
 
@@ -279,7 +279,7 @@ sequence and the 3rd codon positions.
 =item -s/--seq-file
 
 file containing sequences in fasta format, from which each sequence's
-CUB indices are computed.
+CUB metrics are computed.
 
 =back
 
@@ -298,14 +298,14 @@ for valid IDs.
 
 file containing tAI value for each codon in the
 format 'codon<tab>tAI_value', which can be produced by
-L<build_tai_param.pl>. If not given, tAI values would not be
+L<tai_codon.pl>. If not given, tAI values would not be
 computed.
 
 =item -c/--cai-param
 
 similar to --tai-param, except that CAI values are
 provided in the same format. This file may be produced by
-L<build_cai_param.pl>. If not given, CAI values would not be computed.
+L<cai_codon.pl>. If not given, CAI values would not be computed.
 
 =item -f/--fop-param
 
@@ -413,6 +413,10 @@ L<http://search.cpan.org/dist/Bio-CUA/>
 =head1 ACKNOWLEDGEMENTS
 
 =head1 UPDATES
+
+0.12 - Thu Jun  4 11:31:03 EDT 2015
+       
+	   1. update documentation
 
 0.11 - Thu May 21 16:00:28 EDT 2015
        

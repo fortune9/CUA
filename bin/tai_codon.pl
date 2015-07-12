@@ -65,7 +65,7 @@ and amino acids.
 output.
 
 -h/--help: show this help message. For more detailed information, run
-'perldoc build_tai_param.pl'
+'perldoc tai_codon.pl'
 
 Author:  Zhenguo Zhang
 Contact: zhangz.sci\@gmail.com
@@ -81,7 +81,7 @@ USAGE
 
 =head1 NAME
 
-build_tai_param.pl - a program to calculate tAI of each codon
+tai_codon.pl - a program to calculate tAI of each codon
 
 =head1 VERSION
 
@@ -93,7 +93,7 @@ This program calculates tAI (tRNA adaptaion index) at codon level,
 which is part of distribution L<http://search.cpan.org/dist/Bio-CUA/>
 
 # calculate tAI for drosophila melanogaster
-build_tai_param.pl -t dmel_tRNA_copy_number.tsv -o dmel_tAI.tsv
+tai_codon.pl -t dmel_tRNA_copy_number.tsv -o dmel_tAI.tsv
 
 # one can get tRNA copy numbers from the database
 # L<GtRNADB|http://gtrnadb.ucsc.edu/>
@@ -134,7 +134,7 @@ the file to store the result. Default is standard output.
 =item -h/--help
 
 show this help message. For more detailed information, run
-'perldoc build_tai_param.pl'
+'perldoc tai_codon.pl'
 
 =back
 

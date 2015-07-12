@@ -350,7 +350,7 @@ anlyzed for background codon usage.
 -o/--out-file: the file to store the result. Default is standard output.
 
 -h/--help: show this help message. For more detailed information, run
-'perldoc build_cai_param.pl'
+'perldoc cai_codon.pl'
 
 Author:  Zhenguo Zhang
 Contact: zhangz.sci\@gmail.com
@@ -366,7 +366,7 @@ USAGE
 
 =head1 NAME
 
-build_cai_param.pl - a program to calculate CAI for each codon
+cai_codon.pl - a program to calculate CAI for each codon
 
 =head1 VERSION
 
@@ -379,14 +379,14 @@ methods. It is part of distribution
 L<http://search.cpan.org/dist/Bio-CUA/>
 
 # calculate codon CAI by choosing the top 200 highly expressed genes
-build_cai_param.pl -i seqs.fasta -e gene_expression.tsv -s 200 -o CAI_top200
+cai_codon.pl -i seqs.fasta -e gene_expression.tsv -s 200 -o CAI_top200
 
 # the same as above but normalize RSCUs with expected RSCUs under even
 # codon usage
-build_cai_param.pl -i seqs.fasta -e gene_expression.tsv -s 200 -o CAI_top200.by_mean -m mean
+cai_codon.pl -i seqs.fasta -e gene_expression.tsv -s 200 -o CAI_top200.by_mean -m mean
 
 # normalize RSCUs by RSCUs derived from bottom 1000 lowely expressed genes
-build_cai_param.pl -i seqs.fasta -e gene_expression.tsv -s 200 -o CAI_top200.b1000 -b 1000
+cai_codon.pl -i seqs.fasta -e gene_expression.tsv -s 200 -o CAI_top200.b1000 -b 1000
 
 =head1 OPTIONS
 

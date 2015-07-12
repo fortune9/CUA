@@ -1,6 +1,6 @@
 1. Bio-CUA
 
-Version: 1.01
+This is a Perl software package for analyzing codon usage bias.
 
 2. Purpose
 
@@ -57,6 +57,11 @@ perldoc command.
 
     perldoc Bio::CUA
 
+You can also find a tutorial on the CPAN, which is also accessible
+through
+
+    perldoc Bio::CUA::Tutorial
+
 You can also look for information at:
 
     RT, CPAN's request tracker (report bugs here)
@@ -93,6 +98,6 @@ along with this program.  If not, see L<http://www.gnu.org/licenses/>.
 
 6. CITATION
 
-Zhenguo Zhang and Daven C. Presgraves, CUA: a Flexible Codon Usage
-Analyzer (In preparation)
+Zhenguo Zhang, CUA: a Flexible and
+Comprehensive Codon Usage Analyzer (In preparation)
 

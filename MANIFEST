@@ -1,6 +1,6 @@
-bin/build_cai_param.pl
-bin/build_tai_param.pl
-bin/calculate_CUB.pl
+bin/cai_codon.pl
+bin/tai_codon.pl
+bin/cub_seq.pl
 Changes
 ignore.txt
 lib/Bio/CUA.pm

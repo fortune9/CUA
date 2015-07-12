@@ -46,6 +46,7 @@ use strict;
 use warnings;
 use parent qw/Bio::CUA::CUB/;
 use Bio::CUA::CodonTable;
+use Scalar::Util qw/blessed/;
 
 =head1 METHODS
 
@@ -480,7 +481,7 @@ sub _enc_factory
 	
 	# a hash ref, codon => counts
 	my $codonList = $self->get_codon_list($seq) or return;
-	my $seqId = (ref($seq) and $seq->can('id'))? $seq->id : '';
+	my $seqId = (blessed($seq) and $seq->can('id'))? $seq->id : '';
 
 	# determine expected codon frequency if necessary
 	my $expectedCodonFreq;
