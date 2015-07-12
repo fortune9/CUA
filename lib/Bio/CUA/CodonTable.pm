@@ -277,7 +277,7 @@ sub id
 
  Title   : total_num_of_codons
  Usage   : $num = $self->total_num_of_codons;
- Function: get total codons of the genetic code table in use
+ Function: get total number of codons of the genetic code table in use
  Returns : an integer
  Args    : None
 
@@ -328,6 +328,40 @@ sub is_valid_codon
 	return 1;
 }
 
+=head2 all_codons
+
+ Title   : all_codons
+ Usage   : @codons = $self->all_codons;
+ Function: get all the codons in this genetic code table. Codons are
+ ordered by the coded amino acids. Stop codons are also included.
+ Returns : an array of codons, or its reference in scalar context
+ Args    : None
+
+=cut
+
+sub all_codons
+{
+	my ($self) = @_;
+
+	my $codonToAA = $self->{'_codon_to_aa'} or return;
+
+	my %AAs;
+	while(my ($k,$v) = each %$codonToAA)
+	{
+		push @{$AAs{$v}}, $k;
+	}
+
+	# now order the codons
+	my @sortedAAs = sort keys(%AAs);
+	my @codons;
+	foreach my $AA (@sortedAAs)
+	{
+		push @codons, @{$AAs{$AA}};
+	}
+
+	return wantarray? @codons : \@codons;
+}
+
 =head2 all_sense_codons
 
  Title   : all_sense_codons
@@ -353,7 +387,8 @@ sub all_sense_codons
 
  Title   : all_amino_acids
  Usage   : @AAs = $self->all_amino_acids
- Function: get all the amino acids in this genetic code table
+ Function: get all the amino acids in this genetic code table. Stop
+ codons are excluded.
  Returns : an array of amino acids, or its reference if in scalar
  context
  Args    : None

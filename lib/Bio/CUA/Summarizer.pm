@@ -213,14 +213,15 @@ sub get_codon_list
  Function: count codons in the input sequences
  Returns : reference to a hash in which codon is the key and counts as
  values. If $each is true, then each sequence is separately processed
- and stored in a larger hash with the sequence names as hash keys
+ and stored in a larger hash. The count of a codon in a sequence can
+ be retrieved like this: $codonList->{'seqId'}->{'codon'}.
  Args    : accepted arguments are as follows:
  I<input> = name of a file containing fasta sequences
  I<each>  = optional, if TRUE (i.e., non-zero values), each sequence is
  separately processed.
 
- This is a companionate method of L</get_codon_list> for situations
- when one want to get codon counts for each sequence separately.
+This is a companionate method of L</get_codon_list> for situations
+when one want to get codon counts for each sequence separately.
 
 =cut
 
@@ -311,7 +312,7 @@ sub _get_seq_io
 # codon table functions
 =head2 all_sense_codons
 
-get all sense codons in the genetic codon table this object
+get all sense codons in the genetic codon table of this object
 
 =cut
 
@@ -341,7 +342,7 @@ sub all_AAs_in_table
 
 =head2 codons_of_AA
 
-get codons coding the given amino acid, e.g.,
+get codons coding the given amino acid, I<e.g.>,
 
 	my @codons = $self->codons_of_AA('Ser');
 

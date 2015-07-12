@@ -13,7 +13,8 @@ WriteMakefile(
 	#PL_FILES         => {'other.PL' => ''}, # files run during compilation 
 	EXE_FILES        => ["bin/cai_codon.pl",
 	                     "bin/tai_codon.pl",
-						 "bin/cub_seq.pl"
+						 "bin/cub_seq.pl",
+						 "bin/tabulate_codons.pl"
 	                    ], # files in bin directory
     MIN_PERL_VERSION => 5.006,
     CONFIGURE_REQUIRES => {

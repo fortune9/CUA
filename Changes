@@ -8,6 +8,11 @@ Revision history for Bio-CUA
 		   build_tai_param.pl -> tai_codon.pl
 		   calculate_CUB.pl   -> cub_seq.pl
 		The new names reflect the functions of the programs better.
+		3. Add a new program tabulate_codons.pl to count codons in
+		sequence files.
+		4. Add one more method 'all_codons' to the module
+		Bio::CUA::CodonTable.
+		5. Update help documentation.
 
 1.03    Wed May 20 13:25:29 EDT 2015
         1. Add option --fop-param to calculate_CUB.pl so that the

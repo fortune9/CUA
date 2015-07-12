@@ -1,6 +1,7 @@
 bin/cai_codon.pl
 bin/tai_codon.pl
 bin/cub_seq.pl
+bin/tabulate_codons.pl
 Changes
 ignore.txt
 lib/Bio/CUA.pm

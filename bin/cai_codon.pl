@@ -9,7 +9,7 @@ use Getopt::Long;
 use Fcntl qw/:seek/;
 use File::Sort qw/sort_file/;
 use File::Temp qw/ tempfile tempdir /;
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 my $seqIO_pkg;
 
@@ -71,9 +71,11 @@ my $builder = Bio::CUA::CUB::Builder->new(
 		   )
    or die "Creating analyzer failed:$!";
 
+# check the format of input sequences
+my $isInputCodons = &_detect_format($seqFile);
 my $codonListRef;
 my ($sortedFh, $sortedExpFile);
-if($expFile)
+if(!$isInputCodons and $expFile)
 {
 	# sort this $expFile first
 	($sortedFh, $sortedExpFile) = tempfile();
@@ -107,7 +109,7 @@ if($expFile)
 	# output_ids($idsRef,'positive');
 }else # consider codons in all input sequences
 {
-	$codonListRef = &read_codons($seqFile);
+	$codonListRef = &read_codons($seqFile, undef, $isInputCodons);
 }
 
 # now consider background data
@@ -141,7 +143,9 @@ if($background)
 		#output_ids($idsRef,'negative');
 	}elsif(-f $background) # a sequence file
 	{
-		$backCodonListRef = &read_codons($background) or 
+		my $isBackCodons = &_detect_format($background);
+		$backCodonListRef = &read_codons($background, undef,
+			$isBackCodons) or 
 		die "reading codons from $background failed:$!";
 	}else
 	{
@@ -220,17 +224,36 @@ sub num_of_lines
 # read codons from given sequence IDs
 sub read_codons
 {
-	my ($seqFile,$idsRef) = @_;
+	my ($seqFile,$idsRef,$isCodons) = @_;
 	# if $idsRef is not a hash reference, all the sequences in the
-	# input file will be scanned
+	# input file will be scanned.
+	# $isCodons tells whether $seqFile stores codon counts or not
+	
+	my %codonList; # store all the codons of selected sequences
+	if($isCodons) # read codons directly
+	{
+		my $fh;
+		open($fh, "< $seqFile") or die "Can not open $seqFile:$!";
+		while(<$fh>)
+		{
+			chomp;
+			next if /^#/ or /^\s*$/;
+			my ($codon, $cnt) = split $sep;
+			$codon = uc($codon);
+			$codon =~ tr/U/T/;
+			$codonList{uc($codon)} += $cnt; # sum up the same codons
+		}
+		close $fh;
 
-	if(!defined($idsRef)) # no selected IDs
+		return \%codonList;
+	}
+
+	unless(defined($idsRef) and ref($idsRef) eq 'HASH') # no selected IDs
 	{
 		return $builder->get_codon_list($seqFile);
 	}
 
 	my $io = $seqIO_pkg->new(-file => $seqFile, -format => 'fasta');
-	my %codonList; # store all the codons of selected sequences
 	my $seqCnt = 0;
 
 	while(my $seq = $io->next_seq)
@@ -309,18 +332,43 @@ sub _read_column
 	return \%data;
 }
 
+sub _detect_format
+{
+	my $file = shift;
+
+	my $isCodons = 0;
+	my $fh;
+	open($fh, "< $file") or die "Can not open $file:$!";
+	while(<$fh>)
+	{
+		next if /^#/; # comment line
+		next if /^\s*$/;
+		$isCodons = 1 unless(/^>/); # not fasta format
+		last; # only first line is checked
+	}
+	close $fh;
+
+	warn "# $file is in codon-count format\n";
+	return $isCodons;
+}
+
 sub usage
 {
 	print <<USAGE;
 Usage: $0 [options]
 
-This program reads into fasta-formatted sequences and ouput CAI values
-for each codon. 
+This program reads into fasta-formatted sequences or codon counts
+and ouput CAI values for each codon. 
 
 Mandatory options:
 
 -i/--seq-file: a file containing protein-coding sequences in fasta
-format
+format or a list of codon counts. The latter lists the counts of
+codons in the format 'codon1<tab>#1' with each codon per line and
+<tab> as the field delimiter. The program distinguishes these two
+formats based on the first non-empty/non-comment line: if it starts
+with '>', then the format is regarded as 'fasta', otherwise codon
+counts are expected.
 
 Auxiliary options:
 
@@ -333,19 +381,24 @@ all  = all IDs in the expression file given by --exp-file
 ###  = an integer such as 200, then the top 200 highly expressed
 genes.
 Default is 'all'.
+This option is ignored if the input by --seq-file is codon counts.
 
 -b/--background: data for background codon usage estimation.
 0.## = a fraction (e.g.,0.30) of most lowly expressed genes in the
 expression file by --exp-file
 ###  = a number (say 200) of most lowly expressed genes in the
 expression file.
-filename = a file containing protein-coding sequences which will be
-anlyzed for background codon usage.
+filename = a file containing protein-coding sequences or a list of
+codon counts which will be anlyzed for background codon usage. See the
+option --seq-file for format details.
+When this option is given, bCAI is calculated.
 
--g/--gc-id:  ID of genetic code table. 
+-g/--gc-id:  ID of genetic code table. Default is 1, i.e., the
+standard genetic code table. 
 
 -m/--method: method to calculate CAI. Available values are 'max'
-(default) and 'mean'.
+(default) and 'mean'. The former calculates the standard CAI while the
+latter calcualtes mCAI.
 
 -o/--out-file: the file to store the result. Default is standard output.
 
@@ -370,7 +423,7 @@ cai_codon.pl - a program to calculate CAI for each codon
 
 =head1 VERSION
 
-VERSION = 0.01
+VERSION = 0.02
 
 =head1 SYNOPSIS
 
@@ -402,7 +455,13 @@ usage.
 
 =item -i/--seq-file
 
-a file containing protein-coding sequences in fasta format.
+a file containing protein-coding sequences in fasta
+format or a list of codon counts. The latter lists the counts of
+codons in the format 'codon1<tab>#1' with each codon per line and
+<tab> as the field delimiter. The program distinguishes these two
+formats based on the first non-empty/non-comment line: if it starts
+with '>', then the format is regarded as 'fasta', otherwise codon
+counts are expected.
 
 =back
 
@@ -458,8 +517,10 @@ former two formats choose a fraction
 of or a number of genes from the most lowly expressed genes specified
 in the expression file by --exp-file. See option --select for details
 of the two specification formats. The last format specifies a
-fasta-formatted sequence file from which background codon usage is
-calculated.
+fasta-formatted sequence file containing protein-coding sequences or a list of
+codon counts which will be anlyzed for background codon usage. See the
+option --seq-file for format details.
+When this option is given, bCAI is calculated.
 
 =item -g/--gc-id
 
@@ -475,7 +536,8 @@ RSCU is divided by the maximum of all synonymous codons to derive CAI.
 The 'mean' method divides each codon's RSCU by the expected RSCU under
 even codon usage to get CAI. For example, for an amino acid with four synonymous 
 codons, the expected RSCU is 0.25 for each codon, so all observed
-RSCUs of this amino acid's codons are divided by 0.25.
+RSCUs of this amino acid's codons are divided by 0.25. These two
+choices produce CAI and mCAI, respectively.
 
 If option C<--background> is activated, the 'background-normalization'
 method always uses the I<max> method to get final CAIs. 

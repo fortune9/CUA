@@ -317,7 +317,7 @@ sub build_rscu
 =item C<input>
 
  name of a file containing fasta CDS sequences of interested
- genes, or a sequence object with metho I<seq> to derive sequence
+ genes, or a sequence object with method I<seq> to derive sequence
  string, or a plain sequence string, or reference to a hash containing
  codon list with structure like I<{ AGC => 50, GTC => 124}>.
 
@@ -336,9 +336,10 @@ sub build_rscu
  all RSCUs by the maximum of an amino acid, while 'mean' indicates
  dividing RSCU by expected average fraction assuming even usage of
  all codons, i.e., 0.5 for amino acids encoded by 2 codons, 0.25 for
- amino acids encoded by 4 codons, etc. The latter method is able to
- give different CAI values for the most preferred codons of different
- amino acids, which otherwise would be the same (i.e., 1).
+ amino acids encoded by 4 codons, etc. The CAI metric determined by
+ the latter method is named I<mCAI>. mCAI can assign
+ different CAI values for the most preferred codons of different
+ amino acids, which otherwise would be the same by CAI (i.e., 1).
 
 =item C<output>
 
